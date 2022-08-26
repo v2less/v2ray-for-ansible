@@ -1,0 +1,7 @@
+mtg_debug: false
+mtg_verbose: false
+mtg_ip: 0.0.0.0
+mtg_port: 39665
+mtg_user: 'mtg'
+mtg_cap_net_bind_service: false
+mtg_secret: ee07d1a1740a0ec3ebe63603c41137501062696e672e636f6d

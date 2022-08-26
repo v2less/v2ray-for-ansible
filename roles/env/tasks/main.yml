@@ -1,0 +1,7 @@
+---
+- name: Install require module
+  pip:
+    name:
+      - github3.py
+    executable: pip3
+    state: present

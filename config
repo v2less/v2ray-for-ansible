@@ -1,0 +1,9 @@
+server_ip="abc.xyz.com"
+server_ssh_port=22
+new_ssh_port=22
+server_domain="abc.xyz.com"
+email_addr="abc@gmail.com"
+
+client_ip="127.0.0.1"
+client_ssh_port=22
+uuid="a0836f20-8888-28c1-c7c0-d49e7242b9f2"

@@ -1,0 +1,9 @@
+---
+- name: ufw
+  hosts: selfhost
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: ufw
+      sshd_port: "{{ new_ssh_port }}"

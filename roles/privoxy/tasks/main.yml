@@ -1,0 +1,17 @@
+---
+- name: Install privoxy
+  package:
+    name:
+      - privoxy
+      - proxychains
+    state: present
+
+- name: Copy config_proxy script
+  copy:
+    src: config_proxy.sh
+    dest: /root/
+    mode: 0755
+
+- name: Execute the config_proxy script
+  command: bash /root/config_proxy.sh
+

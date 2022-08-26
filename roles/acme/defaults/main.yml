@@ -1,0 +1,35 @@
+---
+# Letsencrypt user
+acme_user: 'letsencrypt'
+
+# Location of datadir
+acme_home_dir: '/var/lib/acme'
+acme_data_dir: '/var/lib/acme/.acme.sh'
+
+# Location of directories
+acme_pki_dir: '/etc/pki/acme'
+acme_pki_dir_owner: 'letsencrypt'
+acme_pki_dir_group: 'letsencrypt'
+acme_pki_dir_permissions: '0755'
+
+# Config off .well-known
+acme_well_known_dir: '/var/www/.well-known/acme-challenge'
+acme_well_known_dir_owner: 'letsencrypt'
+acme_well_known_dir_group: 'letsencrypt'
+acme_well_known_dir_permissions: '0711'
+
+# Location of acme.sh
+acme_script: '/var/lib/acme/acme.sh'
+# Letsencrypt
+acme_script_url:
+  "https://raw.githubusercontent.com/acmesh-official/acme.sh/master/acme.sh"
+
+acme_symlink_to_local: '/usr/local/bin/acme.sh'
+
+# Enable some services restart nginx
+acme_sudo_reload_nginx: true
+acme_sudo_reload_httpd: true
+acme_sudo_reload_haproxy: true
+
+# are we going to use standalone mode (and install socat?)
+acme_standalone_mode_required: true

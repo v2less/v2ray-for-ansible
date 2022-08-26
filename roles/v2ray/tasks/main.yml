@@ -1,0 +1,168 @@
+---
+- name: Install qrencode
+  package:
+    name:
+      - qrencode
+    state: present
+
+- name: Install python3 python3-pip
+  package:
+    name:
+      - python3
+      - python3-pip
+    state: present
+
+- name: Install require module
+  pip:
+    name:
+      - github3.py
+    executable: pip3
+    state: present
+
+- name: ensure directory exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  loop:
+    - /opt/v2ray
+    - /etc/v2ray
+
+- name: Get latest release of v2ray
+  github_release:
+    user: v2fly
+    repo: v2ray-core
+    action: latest_release
+  register: v2ray_latest
+  tags:
+    - update_v2ray
+
+- name: get v2ray binary package
+  unarchive:
+    src: "https://github.com/v2fly/v2ray-core/releases/download/{{ v2ray_latest.tag }}/v2ray-linux-{{ app_arch }}.zip"
+    dest: /opt/v2ray
+    mode: 0755
+    remote_src: yes
+  tags:
+    - update_v2ray
+
+- name: symlink binary files
+  file:
+    src: "/opt/v2ray/{{ item }}"
+    dest: "/usr/bin/{{ item }}"
+    state: link
+    force: yes
+  loop:
+    - v2ray
+    - v2ctl
+  tags:
+    - update_v2ray
+
+
+- name: get uuid
+  command: v2ctl uuid
+  register: uuid
+  changed_when: "uuid.rc != 0"
+
+- name: generate v2ray config
+  template:
+    src: config.json.j2
+    dest: /etc/v2ray/config.json
+    mode: 0644
+  notify:
+    - restart v2ray
+
+- name: copy systemd config
+  copy:
+    src: v2ray.service
+    dest: /etc/systemd/system/v2ray.service
+    mode: 0644
+
+- name: enable v2ray service
+  systemd:
+    name: v2ray
+    state: started
+    daemon_reload: yes
+    enabled: yes
+
+- name: Restart v2ray service
+  systemd:
+    name: v2ray
+    state: restarted
+  tags:
+    - update_v2ray
+
+
+- name: Touch v2ray json
+  file:
+    path: /usr/local/v2ray_qr.json
+    state: touch
+    mode: u=rw,g=r,o=r
+
+- name: mk v2ray log dir
+  file:
+    path: /var/log/v2ray
+    state: directory
+    mode: 0755
+
+- name: Touch v2ray access log file
+  file:
+    path: /var/log/v2ray/access.log
+    state: touch
+    mode: 0644
+
+- name: Touch v2ray error log file
+  file:
+    path: /var/log/v2ray/error.log
+    state: touch
+    mode: 0644
+
+- name: Write v2ray json
+  shell: |
+    echo '{
+    "v": "2",
+    "ps": "{{ domain_name }}",
+    "add": "{{ domain_name }}",
+    "port": "443",
+    "id": "{{ uuid.stdout }}",
+    "aid": "66",
+    "net": "ws",
+    "type": "none",
+    "host": "{{ domain_name }}",
+    "path": "/c58640f/",
+    "tls": "tls"
+    }' > /usr/local/v2ray_qr.json
+  changed_when: true
+
+- name: Touch v2ray json
+  file:
+    path: ~/v2ray.info
+    state: touch
+    mode: u=rw,g=r,o=r
+
+- name: write v2ray info
+  shell: cat /usr/local/v2ray_qr.json > ~/v2ray.info
+  register: resule
+  changed_when: true
+
+- name: write link to v2ray info
+  shell: |
+    set -o pipefail
+    vmess_link="vmess://$(base64 -w 0 /usr/local/v2ray_qr.json)"
+    {
+      echo -n "${vmess_link}" | qrencode -o - -t utf8
+      echo "vmess link: ${vmess_link}"
+    } >> ~/v2ray.info
+  args:
+    executable: /bin/bash
+  when: resule.rc == 0
+
+- name: cat ~/v2ray.info
+  command: cat ~/v2ray.info
+  register: v2ray_info
+  when: resule.rc == 0
+
+- name: print v2ray_conf
+  debug:
+    msg: "{{ v2ray_info.stdout_lines }}"
+

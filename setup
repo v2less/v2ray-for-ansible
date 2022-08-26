@@ -1,0 +1,50 @@
+#!/bin/bash
+set -e
+if ! command -v python3-pip; then
+    sudo apt -y install python3-pip
+fi
+if ! command -v ansible; then
+    echo INFO Install ansible
+    python3 -m pip install ansible
+fi
+source config
+if ping -c 3 "$server_ip"; then
+    cat << EOF | tee inventory/selfhost
+[selfhost]
+myserver ansible_port="$server_ssh_port" ansible_host="$server_ip" ansible_python_interpreter=/usr/bin/python3
+EOF
+fi
+echo INFO set up env
+ansible-playbook -vvv playbooks/env.yml
+
+echo INFO install v2ray
+read -rp "Do you want to install v2ray? yes or no: " _YoN
+case "$_YoN" in
+    yes | y | Y | YES)
+        ansible-playbook -e "email_addr=$email_addr" -e "domain_name=$server_domain" playbooks/v2ray.yml
+        ;;
+    *) ;;
+esac
+
+echo INFO set up mtg
+read -rp "Do you want to install mtp? yes or no: " _YoN
+case "$_YoN" in
+    yes | y | Y | YES)
+        ansible-playbook playbooks/mtg.yml
+        ;;
+    *) ;;
+
+esac
+
+read -rp "Do you want to install ufw? yes or no: " _YoN
+case "$_YoN" in
+    yes | y | Y | YES)
+        ansible-playbook -e "new_ssh_port=$new_ssh_port" playbooks/ufw.yml
+        ;;
+    *) ;;
+
+esac
+
+cat << EOF | tee inventory/selfhost
+[selfhost]
+EOF

@@ -1,0 +1,8 @@
+---
+- name: V2ray
+  hosts: selfhost
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: v2ray_client

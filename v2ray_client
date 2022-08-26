@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+if ! command -v python3-pip; then
+    sudo apt -y install python3-pip
+fi
+if ! command -v ansible; then
+    echo INFO Install ansible
+    python3 -m pip install ansible
+fi
+source config
+if ping -c 3 "$client_ip"; then
+    sudo sed -ri '/proxy/d' /etc/hosts
+    cat << EOF | sudo tee -a /etc/hosts
+${server_ip}       selfhost
+EOF
+    cat << EOF | tee inventory/selfhost
+[selfhost]
+myserver ansible_port="$client_ssh_port" ansible_host="$client_ip" ansible_python_interpreter=/usr/bin/python3
+[selfhost:vars]
+domain_name="$server_domain"
+uuid="$uuid"
+EOF
+fi
+
+ansible-playbook playbooks/v2ray_client.yml
+ansible-playbook playbooks/privoxy.yml
+sudo sed -ri '/proxy/d' /etc/hosts
+cat << EOF | tee inventory/selfhost
+[selfhost]
+EOF

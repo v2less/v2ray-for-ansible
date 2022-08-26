@@ -1,0 +1,78 @@
+---
+- name: Create ACME.sh user
+  user:
+    name: '{{ acme_user }}'
+    home: '{{ acme_home_dir }}'
+    state: present
+
+- name: "Tighten permissions on ACME homedir"
+  file:
+    path: '{{ acme_home_dir }}'
+    mode: '700'
+
+- name: "Create ACME pki dir"
+  file:
+    dest: '{{ acme_pki_dir }}'
+    owner: '{{ acme_pki_dir_owner }}'
+    group: '{{ acme_pki_dir_group }}'
+    mode: '{{ acme_pki_dir_permissions }}'
+    state: directory
+
+- name: "Create ACME well-known dir"
+  file:
+    dest: '{{ acme_well_known_dir }}'
+    owner: '{{ acme_well_known_dir_owner }}'
+    group: '{{ acme_well_known_dir_group }}'
+    mode: '{{ acme_well_known_dir_permissions }}'
+    state: directory
+
+- name: "Download acme.sh from the wild GitHub"
+  get_url:
+    url: "{{ acme_script_url }}"
+    dest: '{{ acme_script }}'
+    mode: '0755'
+
+- name: "Make acme.sh accessible in {{ acme_symlink_to_local }}"
+  file:
+    src: "{{ acme_script }}"
+    dest: "{{ acme_symlink_to_local }}"
+    state: link
+  when: acme_symlink_to_local is defined
+
+- name: Make sure socat is present (for standalone mode)
+  yum:
+    name: socat
+    state: present
+  when:
+    - ansible_os_family == "RedHat"
+    - acme_standalone_mode_required
+
+- name: Make sure socat is present (for standalone mode)
+  apt:
+    name: socat
+    state: present
+  when:
+    - ansible_os_family == "Debian"
+    - acme_standalone_mode_required
+
+
+- name: "Enable sudo reload nginx by letsencrypt"
+  template:
+    src: letsencrypt-restart-nginx.j2
+    dest: /etc/sudoers.d/20-letsencrypt-nginx-restart
+    mode: 0600
+  when: acme_sudo_reload_nginx
+
+- name: "Enable sudo reload haproxy by letsencrypt"
+  template:
+    src: letsencrypt-restart-haproxy.j2
+    dest: /etc/sudoers.d/20-letsencrypt-haproxy-restart
+    mode: 0600
+  when: acme_sudo_reload_haproxy
+
+- name: "Enable sudo reload httpd by letsencrypt"
+  template:
+    src: letsencrypt-restart-httpd.j2
+    dest: /etc/sudoers.d/20-letsencrypt-httpd-restart
+    mode: 0600
+  when: acme_sudo_reload_httpd
