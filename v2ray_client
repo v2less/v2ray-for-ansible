@@ -9,7 +9,7 @@ if ! command -v ansible; then
 fi
 source config
 if ping -c 3 "$client_ip"; then
-    sudo sed -ri '/proxy/d' /etc/hosts
+    sudo sed -ri '/selfhost/d' /etc/hosts
     cat << EOF | sudo tee -a /etc/hosts
 ${server_ip}       selfhost
 EOF

@@ -58,11 +58,16 @@
   tags:
     - update_v2ray
 
-
-- name: get uuid
+- name: gen uuid
   command: v2ctl uuid
-  register: uuid
-  changed_when: "uuid.rc != 0"
+  register: uuid_tmp
+  changed_when: "uuid_tmp.rc != 0"
+  when: uuid is not defined
+
+- name: set uuid
+  set_fact:
+    uuid: "{{ uuid_tmp.stdout }}"
+  when: uuid is not defined
 
 - name: generate v2ray config
   template:
@@ -124,8 +129,8 @@
     "ps": "{{ domain_name }}",
     "add": "{{ domain_name }}",
     "port": "443",
-    "id": "{{ uuid.stdout }}",
-    "aid": "66",
+    "id": "{{ uuid }}",
+    "aid": "0",
     "net": "ws",
     "type": "none",
     "host": "{{ domain_name }}",

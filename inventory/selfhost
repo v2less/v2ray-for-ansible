@@ -1,2 +1,1 @@
 [selfhost]
-myserver ansible_port="39271" ansible_host="abc.v2less.com" ansible_python_interpreter=/usr/bin/python3

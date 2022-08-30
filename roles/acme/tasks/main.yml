@@ -55,6 +55,11 @@
     - ansible_os_family == "Debian"
     - acme_standalone_mode_required
 
+- name: Enable sudoers.d directory
+  file:
+    path: /etc/sudoers.d
+    state: directory
+    mode: 0755
 
 - name: "Enable sudo reload nginx by letsencrypt"
   template:

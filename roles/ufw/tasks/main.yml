@@ -50,11 +50,6 @@
     port: 80
     proto: tcp
 
-- name: Allow v2ray 8600
-  community.general.ufw:
-    rule: allow
-    port: 8600
-
 - name: Allow rssbot
   community.general.ufw:
     rule: allow
