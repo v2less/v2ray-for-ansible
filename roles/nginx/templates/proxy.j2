@@ -15,9 +15,9 @@ server {
     listen 443 ssl http2;
     server_name {{ domains.proxy.to }};
 
-    ssl_certificate /data/v2ray.crt;
-    ssl_certificate_key /data/v2ray.key;
-    ssl_trusted_certificate /data/v2ray.crt;
+    ssl_certificate /data/{{ domains.proxy.to }}.crt;
+    ssl_certificate_key /data/{{ domains.proxy.to }}.key;
+    ssl_trusted_certificate /data/{{ domains.proxy.to }}.crt;
     include /etc/nginx/ssl_params;
 {% endif %}
 

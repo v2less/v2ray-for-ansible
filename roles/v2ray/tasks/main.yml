@@ -37,9 +37,10 @@
   tags:
     - update_v2ray
 
+      #    src: "https://github.com/v2fly/v2ray-core/releases/download/{{ v2ray_latest.tag }}/v2ray-linux-{{ app_arch }}.zip"
 - name: get v2ray binary package
   unarchive:
-    src: "https://github.com/v2fly/v2ray-core/releases/download/{{ v2ray_latest.tag }}/v2ray-linux-{{ app_arch }}.zip"
+    src: "https://github.com/v2fly/v2ray-core/releases/download/v4.45.2/v2ray-linux-{{ app_arch }}.zip"
     dest: /opt/v2ray
     mode: 0755
     remote_src: yes
