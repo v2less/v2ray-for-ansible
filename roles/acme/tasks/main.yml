@@ -50,6 +50,7 @@
 - name: Make sure socat is present (for standalone mode)
   apt:
     name: socat
+    update_cache: yes
     state: present
   when:
     - ansible_os_family == "Debian"

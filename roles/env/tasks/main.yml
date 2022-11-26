@@ -2,6 +2,15 @@
 - name: Install require module
   pip:
     name:
+      - pip
+    executable: pip3
+    extra_args: -i https://pypi.tuna.tsinghua.edu.cn/simple
+    state: latest
+
+- name: Install require module
+  pip:
+    name:
       - github3.py
     executable: pip3
+    extra_args: -i https://pypi.tuna.tsinghua.edu.cn/simple
     state: present

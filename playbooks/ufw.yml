@@ -4,6 +4,9 @@
   gather_facts: true
   become: true
 
+  vars:
+    ansible_user: admin
+
   roles:
     - role: ufw
       sshd_port: "{{ new_ssh_port }}"
