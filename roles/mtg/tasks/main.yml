@@ -6,13 +6,6 @@
       - python3-pip
     state: present
 
-- name: Install require module
-  pip:
-    name:
-      - github3.py
-    executable: pip3
-    state: present
-
 - name: Create mtg user
   user:
     name: "{{ mtg_user }}"
@@ -33,17 +26,18 @@
     - /etc/mtg
 
 - name: Get latest release of mtg
-  github_release:
-    user: 9seconds
-    repo: mtg
-    action: latest_release
+  shell: |
+    set -o pipefail
+    git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' http://github.com/9seconds/mtg.git 2>/dev/null | tail --lines=1 | cut --delimiter='/' --fields=3
+  args:
+    executable: /bin/bash
   register: mtg_latest
   tags:
     - get_mtg
 
 - name: Download binary
   get_url:
-    url: "https://github.com/9seconds/mtg/releases/download/{{ mtg_latest.tag }}/mtg-{{ mtg_latest.tag.split('v')[1]}}-linux-{{ mtg_architecture | default('amd64') }}.tar.gz"
+    url: "https://github.com/9seconds/mtg/releases/download/{{ mtg_latest.stdout }}/mtg-{{ mtg_latest.split('v')[1]}}-linux-{{ mtg_architecture | default('amd64') }}.tar.gz"
     dest: /opt/mtg/mtg-linux-amd64.tar.gz
     owner: "{{ mtg_user }}"
     group: "{{ mtg_user }}"

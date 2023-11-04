@@ -19,7 +19,7 @@ echo INFO install v2ray
 read -rp "Do you want to install v2ray? yes or no: " _YoN
 case "$_YoN" in
     yes | y | Y | YES)
-        ansible-playbook -e "email_addr=$email_addr" -e "domain_name=$server_domain" -e "uuid=$uuid" playbooks/v2ray.yml
+        ansible-playbook -vvv -e "email_addr=$email_addr" -e "domain_name=$domain_name" -e "uuid=$uuid" playbooks/v2ray.yml
         ;;
     *) ;;
 esac

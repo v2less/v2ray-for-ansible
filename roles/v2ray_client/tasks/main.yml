@@ -7,14 +7,6 @@
       - unzip
     state: present
 
-- name: Install require module
-  pip:
-    name:
-      - github3.py
-    executable: pip3
-    extra_args: -i https://mirrors.aliyun.com/pypi/simple/
-    state: forcereinstall
-
 - name: ensure directory exist
   file:
     path: "{{ item }}"
@@ -25,28 +17,27 @@
     - /etc/v2ray
 
 - name: Get latest release of v2ray
-  github_release:
-    user: v2fly
-    repo: v2ray-core
-    action: latest_release
+  shell: |
+    set -o pipefail
+    git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' http://github.com/v2fly/v2ray-core.git 2>/dev/null | tail --lines=1 | cut --delimiter='/' --fields=3
+  args:
+    executable: /bin/bash
   register: v2ray_latest
 
 - name: get v2ray binary package
   unarchive:
-    #src: "https://github.com/v2fly/v2ray-core/releases/download/{{ v2ray_latest.tag }}/v2ray-linux-64.zip"
-    src: "v2ray-linux-64.zip"
+    src: "https://github.com/v2fly/v2ray-core/releases/download/{{ v2ray_latest.stdout }}/v2ray-linux-64.zip"
     dest: /opt/v2ray
     mode: 0755
-   #remote_src: yes
+    remote_src: yes
   when: ansible_architecture == "x86_64"
 
 - name: get v2ray binary package
   unarchive:
-    #src: "https://github.com/v2fly/v2ray-core/releases/download/{{ v2ray_latest.tag }}/v2ray-linux-arm64-v8a.zip"
-    src: "v2ray-linux-arm64-v8a.zip"
+    src: "https://github.com/v2fly/v2ray-core/releases/download/{{ v2ray_latest.stdout }}/v2ray-linux-arm64-v8a.zip"
     dest: /opt/v2ray
     mode: 0755
-   #remote_src: yes
+    remote_src: yes
   when: ansible_architecture == "aarch64"
 
 - name: symlink binary files

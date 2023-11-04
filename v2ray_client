@@ -17,7 +17,7 @@ EOF
 [selfhost]
 myserver ansible_port="$client_ssh_port" ansible_host="$client_ip" ansible_python_interpreter=/usr/bin/python3
 [selfhost:vars]
-domain_name="$server_domain"
+domain_name="$domain_name"
 uuid="$uuid"
 EOF
 fi

@@ -5,7 +5,7 @@
   become: true
 
   vars:
-    ansible_user: admin
+    ansible_user: root
 
   roles:
     - role: ufw

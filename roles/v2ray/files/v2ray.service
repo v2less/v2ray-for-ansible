@@ -11,11 +11,11 @@ Wants=network.target
 # Group=v2ray
 Type=simple
 PIDFile=/run/v2ray.pid
-ExecStart=/usr/bin/v2ray -config /etc/v2ray/config.json
+ExecStart=/usr/bin/v2ray run -config /etc/v2ray/config.json
 Restart=on-failure
 # Don't restart in the case of configuration error
 RestartPreventExitStatus=23
-Environment="V2RAY_VMESS_AEAD_FORCED=false V2RAY_LOCATION_ASSET=/opt/v2ray"
+Environment="V2RAY_VMESS_AEAD_FORCED=false V2RAY_LOCATION_ASSET=/etc/v2ray"
 
 [Install]
 WantedBy=multi-user.target
